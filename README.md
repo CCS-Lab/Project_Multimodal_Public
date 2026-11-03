@@ -1,8 +1,12 @@
-# Multimodal Tiny RNN for Next-Day Alcohol Craving Prediction
+# Forecasting Next-Day Alcohol Craving in Individuals with Problematic Alcohol UseDrinkers w With Multimodal Data and a Tiny Recurrent Neural Network: Prospective Longitudinal Study
 
-This repository contains the analysis pipeline for predicting next-day alcohol craving from longitudinal ecological momentary assessment (EMA) data and participant-level baseline measurements. The core model is a compact vanilla recurrent neural network (RNN) whose initial hidden state is personalized using static psychological, cognitive, EEG, and heart-rate-variability (HRV) features.
+This repository provides the research code accompanying our accepted paper on multimodal next-day alcohol craving prediction. It contains the analysis pipeline for predicting next-day alcohol craving from longitudinal ecological momentary assessment (EMA) data and participant-level baseline measurements. The core model is a compact vanilla recurrent neural network (RNN) whose initial hidden state is personalized using static psychological, cognitive, EEG, and heart-rate-variability (HRV) features.
 
 The repository covers the full workflow from preprocessing and exploratory analysis to repeated-seed model evaluation, sliding-window experiments, post-hoc analyses, and modality-specific ablation studies.
+
+> **Data access:** Clinical and participant-level CSV data are not publicly available. Please contact the corresponding author to inquire about access; see [Data availability and contact](#data-availability-and-contact). The notebooks require these restricted inputs to run.
+
+<!-- Before release: verify the supplied title wording "Alcohol UseDrinkers w With" and add authors, journal, DOI, and corresponding author email. -->
 
 ## Research overview
 
@@ -60,7 +64,6 @@ Only windows containing consecutive `day_order` values are retained. Labels are 
 ```text
 .
 ├── 1. Data Preprocessing/
-│   ├── Final_PreprocessBaselineData.ipynb
 │   ├── Final_BaselineFeatureSelection.ipynb
 │   ├── Final_PreprocessAppData.ipynb
 │   ├── Final_PreprocessAppData2.ipynb
@@ -76,8 +79,7 @@ Only windows containing consecutive `day_order` values are retained. Labels are 
 │   ├── Best_EPOCH_Unimodal.ipynb
 │   ├── Best_EPOCH_Multimodal.ipynb
 │   ├── Sliding_Window_2_Best_EPOCH_Unimodal.ipynb
-│   ├── Sliding_Window_2_Best_EPOCH_Multimodal.ipynb
-│   └── Concatenated_Multimodal.ipynb
+│   └── Sliding_Window_2_Best_EPOCH_Multimodal.ipynb
 ├── 4.Post Hoc/
 │   ├── Best_Compare_User.ipynb
 │   ├── Sliding_Window_2_Best_Compare_User.ipynb
@@ -98,7 +100,16 @@ Only windows containing consecutive `day_order` values are retained. Labels are 
     └── PF_Multimodal.ipynb
 ```
 
-CSV files in these directories contain intermediate datasets, selected feature sets, participant summaries, and post-hoc result tables.
+The tree shows the notebooks intended for the public release. Clinical CSV files, intermediate tables, and participant-level result tables are excluded. `3.Modeling/Concatenated_Multimodal.ipynb` is also excluded from the public release.
+
+| Directory | Purpose |
+|---|---|
+| `1. Data Preprocessing/` | Clean app records, derive sleep/alcohol variables, construct shifted targets, standardize inputs, and select features. |
+| `2.Data Analysis/` | Summarize demographics, EMA adherence, craving distributions, and participant-level variability/entropy. |
+| `3.Modeling/` | Compare unimodal and multimodal RNNs with validation-selected checkpoints using four-day and two-day windows. |
+| `4.Post Hoc/` | Compare participant-level accuracy using paired tests and explore correlations with craving characteristics. |
+| `5.Sliding Windows/` | Evaluate 2-, 4-, 6-, and 8-day sequences for both model variants across 100 seeds. |
+| `6.Ablation Study/` | Combine the same daily EMA inputs with EEG-only, HRV-only, or psychological-factor-only static inputs. |
 
 ## Main input features
 
@@ -123,11 +134,11 @@ The multimodal baseline vector combines:
 - EEG band-power features across selected electrodes;
 - HRV/autonomic measures, including autonomic activity, autonomic balance, cardiac stability, Tp, ApEn, Srd, and VLF-related features.
 
-The ablation notebooks evaluate modality-specific static feature sets. `PF_Multimodal.ipynb` retains five psychological-factor features, while `HRV_Multimodal.ipynb` retains eight HRV/autonomic features. `EEG_Multimodal.ipynb` contains the corresponding EEG-focused experiment.
+The ablation notebooks evaluate modality-specific static feature sets. `PF_Multimodal.ipynb` retains five psychological-factor features, while `HRV_Multimodal.ipynb` retains eight HRV/autonomic features. `EEG_Multimodal.ipynb` retains 22 EEG features. These experiments retain one static modality at a time; all include daily EMA inputs.
 
 ## Installation
 
-The executed notebooks record Python 3.9.23. A compatible environment can be created as follows:
+The notebook metadata records Python 3.9.23. The following commands install the packages imported by the notebooks; dependency versions are not pinned, so this is a setup guide rather than an exact reconstruction of the original environment:
 
 ```bash
 python -m venv .venv
@@ -140,9 +151,15 @@ For Apple Silicon or GPU acceleration, install the PyTorch build appropriate for
 
 ## Recommended execution order
 
-Run notebooks from the repository root or from their own directory while preserving the existing relative paths.
+Start Jupyter from the repository root, then open notebooks in their respective directories. Each kernel must use the directory containing its notebook as the working directory so that local CSV reads and `../4.Post Hoc/` exports resolve correctly.
 
-1. Run the notebooks in `1. Data Preprocessing/` to construct the cleaned app/EMA data and selected baseline feature tables.
+```bash
+jupyter notebook
+```
+
+Obtain authorized data access before running data-dependent cells. The public code alone cannot reproduce the experiments without the restricted CSV inputs.
+
+1. In `1. Data Preprocessing/`, run `Final_PreprocessAppData.ipynb`, then `Final_PreprocessAppData2.ipynb`, `Final_PreprocessAppData3.ipynb`, `Final_PreprocessAppData4.ipynb`, and `Final_PreprocessAppData5(FS).ipynb`. Run `Final_BaselineFeatureSelection.ipynb` after `RAW_LAG_APP.csv` and the externally prepared `RAW_Scaled_Baseline.csv` are available.
 2. Use `2.Data Analysis/` for descriptive statistics, EMA analyses, and figures.
 3. Run the primary unimodal and multimodal experiments in `3.Modeling/`.
 4. Run `5.Sliding Windows/` to compare sequence lengths of 2, 4, 6, and 8 days.
@@ -158,26 +175,24 @@ Baseline_FeatureSelection.csv
 
 Because several notebooks use relative paths such as `../4.Post Hoc/...`, changing the working directory can break file loading or result export.
 
-## Recorded results
+## Required data and generated outputs
 
-The stored outputs in the primary four-day multimodal notebook report the following mean ± standard deviation over 100 seeds:
+All CSV files below are restricted and are omitted from the public release.
 
-| Split | Accuracy | Macro F1 | Weighted F1 | MAE |
-|---|---:|---:|---:|---:|
-| Train | 0.5864 ± 0.0228 | 0.4260 ± 0.0592 | 0.5327 ± 0.0397 | 0.6148 ± 0.0390 |
-| Validation | 0.5254 ± 0.0249 | 0.3208 ± 0.0466 | 0.4860 ± 0.0312 | 0.7163 ± 0.0401 |
-| Test | 0.5558 ± 0.0213 | 0.3723 ± 0.0447 | 0.5102 ± 0.0335 | 0.6790 ± 0.0354 |
+| Stage | Main inputs | Outputs / use |
+|---|---|---|
+| App preprocessing | `records_record.csv`, `records_record (1).csv` | `PrepApp1.csv` → `PrepApp2.csv` → `RAW_APP_NO_LAG.csv` / `RAW_LAG_APP.csv` → `APP_Scaled_LAG.csv` → `App_FeatureSelection.csv` |
+| Baseline feature selection | `RAW_Scaled_Baseline.csv`, `RAW_LAG_APP.csv` | Currently writes `Baseline_FeatureSelection copy copy.csv`; verify the selected columns and prepare the `Baseline_FeatureSelection.csv` expected by modeling. |
+| Descriptive analyses | `PrepBaseline3.csv`, `APP_Scaled_LAG.csv`, `RAW_APP_NO_LAG.csv` | Descriptive statistics, figures, and participant summaries. |
+| Unimodal modeling | `App_FeatureSelection.csv` | Run-level metrics, predictions, and participant accuracy summaries. |
+| Multimodal modeling and ablation | `App_FeatureSelection.csv`, `Baseline_FeatureSelection.csv` | Run-level metrics, predictions, and participant accuracy summaries. |
+| Post-hoc analyses | `Best_df_user_UNI.csv`, `Best_df_user_MULTI.csv`, corresponding `Sliding_window_2_...` files, `Participant_summary.csv`, `Participant_valid_sample_summary.csv`, and `App_FeatureSelection.csv` as needed | Paired Wilcoxon / t-tests, correlation analyses, and figures. |
 
-The 95% confidence interval for multimodal test accuracy is 0.5516–0.5600.
+Place authorized copies of each input in the directory of the notebook that reads it. Baseline preprocessing before `RAW_Scaled_Baseline.csv` and `PrepBaseline3.csv` is not implemented in the notebooks included here.
 
-Modality-specific static feature experiments stored in the ablation notebooks report:
+The selected app table contains participant/date fields (`user_id`, `user_order`, `date`, `day_order`, `date_diff`), the 11 daily features listed above, and `tmrw_alcohol_desire`. Multimodal notebooks use the 41 explicitly listed baseline features and build a participant-to-static-vector mapping. Preserve the original column names, including Korean names, and participant alignment.
 
-| Static feature set | Test accuracy | Test macro F1 | Test weighted F1 | Test MAE |
-|---|---:|---:|---:|---:|
-| HRV/autonomic | 0.5291 ± 0.0212 | 0.3402 ± 0.0442 | 0.4766 ± 0.0290 | 0.7298 ± 0.0373 |
-| Psychological factors | 0.5005 ± 0.0231 | 0.3277 ± 0.0428 | 0.4498 ± 0.0305 | 0.7963 ± 0.0410 |
-
-These values are notebook outputs, not results recomputed during installation. Re-running the full 100-seed experiments may take substantial time.
+Model summaries are held in notebook variables such as `df_runs`, `df_hist`, and `df_user_summary`. Some participant-level export statements are commented out. Enable the relevant exports when generating inputs for post-hoc analysis. Ablation notebooks currently write to the same `../4.Post Hoc/Best_df_user_MULTI.csv` path as the full model; assign distinct output paths before running ablations to preserve the full-model comparison.
 
 ## Reproducibility notes
 
@@ -185,43 +200,36 @@ These values are notebook outputs, not results recomputed during installation. R
 - The notebooks use CPU tensors directly and do not currently include explicit CUDA/MPS device handling.
 - PyTorch deterministic-algorithm settings are not enabled, so exact results may vary across platforms or library versions.
 - The training loader is shuffled, while validation and test loaders are not.
-- Class imbalance is visible in the stored confusion matrix; accuracy should therefore be interpreted together with macro F1 and MAE.
+- Interpret accuracy together with macro F1 and MAE when evaluating class-imbalanced craving labels.
 - One baseline record is removed by positional index before `user_order` is regenerated. Verify this step if the upstream table changes.
-- Some result-export lines are commented out and must be enabled when regenerating downstream post-hoc CSV files.
+- The configuration table above describes `3.Modeling/Best_EPOCH_Multimodal.ipynb`. The notebooks in `5.Sliding Windows/` use hidden size 8; do not assume every experiment shares the primary model configuration.
+- Windows are assigned to splits by their final input-row index, whose stored target is already shifted to the next observation. Validation/test windows can include earlier historical inputs. This evaluates future observations for known participants rather than generalization to unseen participants.
+- The target is constructed with a within-participant `shift(-1)`. Window construction checks consecutive input days and, when a following row exists, its day gap. The final retained row does not receive that following-row gap check.
+- Original data cleaning includes fixed row-index exclusions and participant exclusions. These steps assume the original row order and must be reviewed for a different dataset.
+- The original executions of `HRV_Multimodal.ipynb` and `PF_Multimodal.ipynb` recorded a `KeyError` for `target_day ` (a trailing space) in a downstream prediction-summary cell. Review that column reference before a full rerun.
 
-## Data availability and privacy
+## Data availability and contact
 
-This project includes human-participant research data and participant identifiers. Do not publish raw or row-level CSV files unless data sharing is explicitly permitted by the study protocol, institutional review board, and participant consent.
+Notebook outputs, execution counts, and execution metadata are removed from the public copies to avoid exposing participant-level tables and figures. Local research originals are preserved separately.
 
-For a public GitHub repository, consider tracking only code, documentation, schemas, and approved aggregate results. Keep restricted data outside Git and provide access instructions or synthetic examples instead.
+The data used in this study contain sensitive medical and human-participant information and **cannot be made publicly available**. All CSV files are excluded from this public code release, including raw clinical/EMA records, processed datasets, selected-feature tables, participant summaries, and participant-level prediction or performance tables.
 
-Suggested `.gitignore` entries:
+Researchers interested in accessing the data should contact the corresponding author of the associated paper. Requests will be considered subject to applicable ethical approvals, participant consent, institutional policies, and any required data-use agreement. Contacting the authors does not guarantee access.
 
-```gitignore
-.DS_Store
-.ipynb_checkpoints/
-.venv/
-__pycache__/
+**Data-access contact:** Corresponding author of the associated paper. A direct contact email will be added with the final publication details.
 
-# Review before enabling: raw or participant-level research data
-*.csv
-```
-
-If selected aggregate CSV files are safe to publish, replace the broad CSV rule with directory- or filename-specific rules.
+Please do not include participant information or restricted datasets in public GitHub issues.
 
 ## Citation
 
-If this repository supports a paper or thesis, add the final citation and DOI here once available:
+This repository accompanies the accepted paper:
 
-```bibtex
-@article{citation_pending,
-  title   = {Multimodal Prediction of Alcohol Craving Dynamics with a Tiny RNN},
-  author  = {Author information pending},
-  journal = {Publication information pending},
-  year    = {Year pending}
-}
-```
+**Forecasting Next-Day Alcohol Craving in Individuals with Problematic Alcohol UseDrinkers w With Multimodal Data and a Tiny Recurrent Neural Network: Prospective Longitudinal Study**
+
+The author list, journal, and DOI will be added when the publication details are available. Please cite the associated paper when using this code.
+
+<!-- Replace this note with the verified citation and BibTeX entry. -->
 
 ## License
 
-No license file is currently included. Add an explicit software license before public redistribution. Note that a code license does not grant permission to redistribute participant data.
+No software license is currently provided in this directory. Data-access permission is separate from software licensing and does not authorize redistribution of participant data.

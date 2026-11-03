@@ -218,3 +218,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Restricted clinical datasets and excluded experimental notebook
+*.csv
+3.Modeling/Concatenated_Multimodal.ipynb
