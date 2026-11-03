@@ -1,4 +1,4 @@
-# Forecasting Next-Day Alcohol Craving in Individuals with Problematic Alcohol UseDrinkers w With Multimodal Data and a Tiny Recurrent Neural Network: Prospective Longitudinal Study
+# Forecasting Next-Day Alcohol Craving in Individuals with Problematic Alcohol Use Drinkers With Multimodal Data and a Tiny Recurrent Neural Network: Prospective Longitudinal Study
 
 This repository provides the research code accompanying our accepted paper on multimodal next-day alcohol craving prediction. It contains the analysis pipeline for predicting next-day alcohol craving from longitudinal ecological momentary assessment (EMA) data and participant-level baseline measurements. The core model is a compact vanilla recurrent neural network (RNN) whose initial hidden state is personalized using static psychological, cognitive, EEG, and heart-rate-variability (HRV) features.
 
