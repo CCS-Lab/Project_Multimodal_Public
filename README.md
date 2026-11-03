@@ -202,7 +202,7 @@ Model summaries are held in notebook variables such as `df_runs`, `df_hist`, and
 - The training loader is shuffled, while validation and test loaders are not.
 - Interpret accuracy together with macro F1 and MAE when evaluating class-imbalanced craving labels.
 - One baseline record is removed by positional index before `user_order` is regenerated. Verify this step if the upstream table changes.
-- The configuration table above describes `3.Modeling/Best_EPOCH_Multimodal.ipynb`. The notebooks in `5.Sliding Windows/` use hidden size 8; do not assume every experiment shares the primary model configuration.
+- The primary multimodal notebook and all eight notebooks in `5.Sliding Windows/` configure an RNN hidden size of 16.
 - Windows are assigned to splits by their final input-row index, whose stored target is already shifted to the next observation. Validation/test windows can include earlier historical inputs. This evaluates future observations for known participants rather than generalization to unseen participants.
 - The target is constructed with a within-participant `shift(-1)`. Window construction checks consecutive input days and, when a following row exists, its day gap. The final retained row does not receive that following-row gap check.
 - Original data cleaning includes fixed row-index exclusions and participant exclusions. These steps assume the original row order and must be reviewed for a different dataset.
